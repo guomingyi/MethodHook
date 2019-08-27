@@ -33,16 +33,20 @@ public class HookTestDemo {
             }
 
             // public
-            mIhookManager.hookMethod(this,"test_public", "public_hook", String.class);
+            mIhookManager.hookMethod(Class.forName("com.hook_test.HookTestDemo"),
+                    "test_public", "public_hook", String.class);
 
             // protect
-            mIhookManager.hookMethod(this,"test_protect", "protect_hook", String.class);
+            mIhookManager.hookMethod(Class.forName("com.hook_test.HookTestDemo"),
+                    "test_protect", "protect_hook", String.class);
 
             // private
-            mIhookManager.hookMethod(this,"test_private", "private_hook", String.class);
+            mIhookManager.hookMethod(Class.forName("com.hook_test.HookTestDemo"),
+                    "test_private", "private_hook", String.class);
 
             // static
-            mIhookManager.hookMethod(this,"test_static", "static_hook", String.class);
+            mIhookManager.hookMethod(Class.forName("com.hook_test.HookTestDemo"),
+                    "test_static", "static_hook", String.class);
 
             setText("hook 完成");
         }
@@ -83,6 +87,9 @@ public class HookTestDemo {
         if (tag.equals("from hook")) {
             Toast.makeText(mContext, "test_public hook success", Toast.LENGTH_SHORT).show();
             setText("test_public hook 执行 success");
+        }
+        else {
+            setText("test_public:"+tag);
         }
     }
     public void public_hook(String tag) {

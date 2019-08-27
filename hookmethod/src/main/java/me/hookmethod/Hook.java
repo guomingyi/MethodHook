@@ -36,10 +36,13 @@ public class Hook {
     }
 
     /** 调用原方法 */
-    public static Object callOrigin(Object receiver, String methodName, Object...params) {
+    public static Object callOrigin(Object receiver, String method, Object...params) {
         try {
-            Method backup = sBackupMap.get(methodName).getBackup();
-            return backup.invoke(receiver, params);
+            if (sBackupMap.get(method).getUsed() > 0) {
+                Method backup = sBackupMap.get(method).getBackup();
+                return backup.invoke(receiver, params);
+            }
+            Log.i(TAG, "callOrigin: failure.");
         } catch (Exception e) {
             Log.i(TAG, "callOrigin.:"+e);
             e.printStackTrace();
@@ -53,6 +56,7 @@ public class Hook {
             Method recovery = sBackupMap.get(origin).getRecovery();
             int access = sBackupMap.get(origin).getAccess_flags();
             ArtMethodNative.recoveryMethod(recovery, backup, access);
+            sBackupMap.get(origin).setUsed(0); // 标记为已经不再使用.
             return recovery;
         }
         catch (Exception e) {

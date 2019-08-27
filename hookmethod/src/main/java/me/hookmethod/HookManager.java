@@ -29,15 +29,16 @@ public class HookManager implements IhookManager {
         return mHookManager;
     }
 
+    @Override
     public boolean hookMethod(Method origin, Method replace) {
         return Hook.hook(origin, replace);
     }
 
     @Override
-    public boolean hookMethod(Object receiver, String origin, String replace, Class<?>... params) {
+    public boolean hookMethod(Class<?> clz, String origin, String replace, Class<?>... params) {
         try {
-            Method ori = receiver.getClass().getDeclaredMethod(origin, params);
-            Method rep = receiver.getClass().getDeclaredMethod(replace, params);
+            Method ori = clz.getDeclaredMethod(origin, params);
+            Method rep = clz.getDeclaredMethod(replace, params);
             Log.i(TAG, "origin:"+origin+" replace:"+replace);
             return hookMethod(ori, rep);
         }
