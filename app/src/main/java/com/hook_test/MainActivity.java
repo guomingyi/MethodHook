@@ -10,8 +10,6 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import me.hookmethod.HookTestDemo;
-
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     static final String TAG = "Hook_test-MainActivity";
     Button do_hook, origin_method, hook_public_method;
@@ -49,24 +47,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mTestDemo.setTextView(sample_text);
     }
 
-    public TextView getTextView() {
-        return sample_text;
-    }
-
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.do_hook:
                 Log.i(TAG, "执行hook.");
                 try {
-                    //Log.i(TAG, "CLICK HOOK TEST");
                     mTestDemo.hook(MainActivity.this);
-                    //Toast.makeText(mContext, "hook ok!", Toast.LENGTH_SHORT).show();
                     hook_public_method.performClick();
                     hook_private_method.performClick();
                     hook_protected_method.performClick();
                     hook_static_method.performClick();
-
                 } catch (Throwable e) {
                     Log.i(TAG, "E:"+e);
                     e.printStackTrace();
@@ -75,23 +66,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.origin_method:
                 break;
             case R.id.hook_public_method:
-                //Log.i(TAG, "hook_public_method:");
-                //Toast.makeText(mContext, "public", Toast.LENGTH_SHORT).show();
                 mTestDemo.test_public("public");
                 break;
             case R.id.hook_protected_method:
-               // Log.i(TAG, "hook_protected_method:");
-               // Toast.makeText(mContext, "protect", Toast.LENGTH_SHORT).show();
                 mTestDemo.test_protect_ext("protect");
                 break;
             case R.id.hook_private_method:
-               // Log.i(TAG, "hook_private_method:");
-                //Toast.makeText(mContext, "private", Toast.LENGTH_SHORT).show();
                 mTestDemo.test_private_ext("private");
                 break;
             case R.id.hook_static_method:
-               // Log.i(TAG, "hook_static_method:");
-               // Toast.makeText(mContext, "static", Toast.LENGTH_SHORT).show();
                 mTestDemo.test_static_ext("static");
                 break;
         }

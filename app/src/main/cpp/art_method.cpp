@@ -92,7 +92,7 @@ static jboolean hook_method(JNIEnv* env, jclass cl, jobject origin, jobject repl
     memcpy(p_origin, p_replace, length);
     ALOGI("origin[1]: %s\n", mem_to_str(p_origin, length));
 
-    ALOGI("hook method finish: %d\n");
+    ALOGI("hook method finish.\n");
     return true;
 }
 

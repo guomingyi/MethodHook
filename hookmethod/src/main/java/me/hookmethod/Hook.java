@@ -1,12 +1,13 @@
 package me.hookmethod;
 
+import android.content.Context;
 import android.util.Log;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
 
 public class Hook {
-    private static final String TAG = "Hook";
+    private static final String TAG = "Hook_";
     private static HashMap<String, BackUpObj> sBackupMap = new HashMap<String, BackUpObj>();
 
     /** Hook方法入口,原方法保存在sBackupMap中 */

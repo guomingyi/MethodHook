@@ -36,8 +36,10 @@ android {
 }
 
 dependencies {
-    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    //implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'androidx.appcompat:appcompat:1.0.2'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     implementation project(':hookmethod')
+    implementation project(':Ihookmethod')
+    //implementation files('libs/hookmethod-debug.aar')
 }

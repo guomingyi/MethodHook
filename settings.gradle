@@ -1,1 +1,1 @@
-include ':app', ':Arthook', ':hookmethod'
+include ':app', ':Arthook', ':hookmethod', ':Ihookmethod'

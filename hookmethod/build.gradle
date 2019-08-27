@@ -39,13 +39,14 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.0.2'
+    implementation project(':Ihookmethod')
 
 }
 
 // 打包成jar输出，终端输入  ./gradlew jar  执行.
 task makehookmethodJar(type: Copy) {
     delete 'build/outputs/jar'
-    from('build/intermediates/packaged-classes/release')
+    from('build/intermediates/packaged-classes/debug')
     from('libs')
     into('build/outputs/jar')
     include('classes.jar')
