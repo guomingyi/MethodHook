@@ -100,7 +100,33 @@ static jboolean hook_method(JNIEnv* env, jclass cl, jobject origin, jobject repl
  * ori: 待备份的原方法
  * stub: 备份原方法到一个"桩"方法上.
 */
-static jboolean backup_method(JNIEnv* env, jclass cls, jobject stub, jobject ori) {
+static jint backup_method(JNIEnv* env, jclass cls, jobject stub, jobject ori) {
+    jmethodID jorigin = NULL;
+    jmethodID jstub = NULL;
+
+    jorigin = env->FromReflectedMethod(ori);
+    jstub = env->FromReflectedMethod(stub);
+    if (!jorigin || !jstub) {
+        ALOGE("find class %s method failed", PACKAGE_CLASS_NAME);
+        return -1;
+    }
+
+    u1 *p_ori = reinterpret_cast<u1 *>(jorigin);
+    u1 *p_stub = reinterpret_cast<u1 *>(jstub);
+
+    memcpy(p_stub, p_ori, mMethodInfo.size);
+    u4 offset = mMethodInfo.access_flags_offset;
+    u4 access = *(p_ori + offset);
+    *(p_stub + offset) &= ~ACC_PUBLIC;
+    *(p_stub + offset) |= ACC_PRIVATE;
+    ALOGI("backStub:  %s: access=%08x\n", mem_to_str(p_stub, mMethodInfo.size), access);
+    return access;
+}
+
+/**
+ * 恢复方法
+*/
+static jboolean recovery_method(JNIEnv* env, jclass cls, jobject ori, jobject stub, jint access) {
     jmethodID jorigin = NULL;
     jmethodID jstub = NULL;
 
@@ -114,20 +140,20 @@ static jboolean backup_method(JNIEnv* env, jclass cls, jobject stub, jobject ori
     u1 *p_ori = reinterpret_cast<u1 *>(jorigin);
     u1 *p_stub = reinterpret_cast<u1 *>(jstub);
 
-    memcpy(p_stub, p_ori, mMethodInfo.size);
-    *(p_stub + mMethodInfo.access_flags_offset) &= ~ACC_PUBLIC;
-    *(p_stub + mMethodInfo.access_flags_offset) |= ACC_PRIVATE;
-    ALOGI("backStub:  %s\n", mem_to_str(p_stub, mMethodInfo.size));
+    memcpy(p_ori, p_stub, mMethodInfo.size);
+    *(p_ori + mMethodInfo.access_flags_offset) = (u4)access;
+    ALOGI("recovery_method origin:  %s: access=%08x\n", mem_to_str(p_ori, mMethodInfo.size), access);
     return true;
 }
 
+/** Mapping table */
 static JNINativeMethod g_methods[] ={
-    { "initArtMethodSize",   "()I",                                                     (void *)init_art_method_size },
-    { "setAccessFlagOffset", "(I)V",                                                    (void *)set_access_flags_offset },
-    { "hookMethod",          "(Ljava/lang/reflect/Method;Ljava/lang/reflect/Method;)Z", (void *)hook_method },
-    { "backupMethod",        "(Ljava/lang/reflect/Method;Ljava/lang/reflect/Method;)Z", (void *)backup_method },
+    { "initArtMethodSize",   "()I",                                                      (void *)init_art_method_size },
+    { "setAccessFlagOffset", "(I)V",                                                     (void *)set_access_flags_offset },
+    { "hookMethod",          "(Ljava/lang/reflect/Method;Ljava/lang/reflect/Method;)Z",  (void *)hook_method },
+    { "backupMethod",        "(Ljava/lang/reflect/Method;Ljava/lang/reflect/Method;)I",  (void *)backup_method },
+    { "recoveryMethod",      "(Ljava/lang/reflect/Method;Ljava/lang/reflect/Method;I)Z", (void *)recovery_method },
 };
-
 
 static bool register_jni_method(JNIEnv* env) {
     jclass clazz = env->FindClass(PACKAGE_CLASS_NAME);

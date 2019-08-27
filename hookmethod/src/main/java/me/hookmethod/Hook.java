@@ -20,11 +20,11 @@ public class Hook {
             /** index 用于拿到桩方法索引 */
             int index = sBackupMap.size();
             Method backUp = BackUpStub.class.getDeclaredMethod("bak_"+index);
-            if (ArtMethodNative.backupMethod(backUp, origin)) {
+            int access_flags = ArtMethodNative.backupMethod(backUp, origin);
+            if (access_flags > 0) {
                 backUp.setAccessible(true);
-                /** put到哈希表保存 */
-                sBackupMap.put(origin.getName(), new BackUpObj(replace.getDeclaringClass().getName(), backUp));
-                /** 底层替换 */
+                /** 哈希表保存 */
+                sBackupMap.put(origin.getName(), new BackUpObj(access_flags, backUp, origin));
                 return ArtMethodNative.hookMethod(origin, replace);
             }
         }
@@ -38,10 +38,25 @@ public class Hook {
     /** 调用原方法 */
     public static Object callOrigin(Object receiver, String methodName, Object...params) {
         try {
-            Method method = sBackupMap.get(methodName).getMethod();
-            return method.invoke(receiver, params);
+            Method backup = sBackupMap.get(methodName).getBackup();
+            return backup.invoke(receiver, params);
         } catch (Exception e) {
             Log.i(TAG, "callOrigin.:"+e);
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static Method recovery(String origin) {
+        try {
+            Method backup = sBackupMap.get(origin).getBackup();
+            Method recovery = sBackupMap.get(origin).getRecovery();
+            int access = sBackupMap.get(origin).getAccess_flags();
+            ArtMethodNative.recoveryMethod(recovery, backup, access);
+            return recovery;
+        }
+        catch (Exception e) {
+            Log.i(TAG, "e:"+e);
             e.printStackTrace();
         }
         return null;

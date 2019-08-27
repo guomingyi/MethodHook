@@ -1,9 +1,13 @@
 package com.hook_test;
 
 import android.content.Context;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.lang.reflect.Method;
 
 import me.hookmethod.IhookManager;
 import me.hookmethod.RefsManager;
@@ -11,15 +15,19 @@ import me.hookmethod.RefsManager;
 public class HookTestDemo {
     static final String TAG = "Hook_TestDemo";
     private Context mContext;
-    private TextView mTextview;
+    private EditText mTextview;
     private StringBuilder stringBuilder = new StringBuilder();
     private static IhookManager mIhookManager;
+
+    public HookTestDemo() {
+
+    }
 
     public void hook(Context context) {
         mContext = context;
 
         try {
-            mIhookManager = RefsManager.instance(context);
+           // mIhookManager = RefsManager.instance(context);
             if (mIhookManager == null) {
                 mIhookManager = new me.hookmethod.HookManager(context);
             }
@@ -44,13 +52,30 @@ public class HookTestDemo {
         }
     }
 
-    public void setTextView(TextView tv) {
+    public void recovery() {
+        try {
+            String origin = "test_public";
+            mIhookManager.recoveryMethod(origin);
+            Method method = this.getClass().getDeclaredMethod(origin, String.class);
+            method.invoke(this, "RECOVERYED!");
+            setText("恢复:"+origin+" success!");
+        }
+        catch (Exception e) {
+            Log.i(TAG, "-e:"+e);
+            e.printStackTrace();
+        }
+    }
+
+    public void setTextView(EditText tv) {
        mTextview = tv;
     }
 
     private void setText(String s) {
         stringBuilder.append(s+"\n");
         mTextview.setText(stringBuilder.toString());
+        mTextview.setMovementMethod(ScrollingMovementMethod.getInstance());
+        mTextview.setSelection(mTextview.getText().length(), mTextview.getText().length());
+
     }
 
     public void test_public(String tag) {

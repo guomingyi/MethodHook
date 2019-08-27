@@ -7,14 +7,15 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     static final String TAG = "Hook_test-MainActivity";
-    Button do_hook, origin_method, hook_public_method;
+    Button do_hook, do_unhook, origin_method, hook_public_method;
     Button hook_private_method, hook_protected_method, hook_static_method;
-    TextView sample_text;
+    EditText sample_text;
     Context mContext;
     HookTestDemo mTestDemo;
 
@@ -26,6 +27,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mContext = this;
 
         do_hook = (Button)findViewById(R.id.do_hook);
+        do_unhook = (Button)findViewById(R.id.do_unhook);
         origin_method = (Button)findViewById(R.id.origin_method);
         origin_method.setVisibility(View.GONE);
 
@@ -34,9 +36,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         hook_private_method = (Button)findViewById(R.id.hook_private_method);
         hook_protected_method = (Button)findViewById(R.id.hook_protected_method);
 
-        sample_text = (TextView)findViewById(R.id.sample_text);
+        sample_text = (EditText)findViewById(R.id.sample_text);
 
         do_hook.setOnClickListener(this);
+        do_unhook.setOnClickListener(this);
         origin_method.setOnClickListener(this);
         hook_public_method.setOnClickListener(this);
         hook_private_method.setOnClickListener(this);
@@ -50,6 +53,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
+            case R.id.do_unhook:
+                mTestDemo.recovery();
+                break;
             case R.id.do_hook:
                 Log.i(TAG, "执行hook.");
                 try {

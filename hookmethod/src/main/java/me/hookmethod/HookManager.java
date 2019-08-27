@@ -29,7 +29,6 @@ public class HookManager implements IhookManager {
         return mHookManager;
     }
 
-    @Override
     public boolean hookMethod(Method origin, Method replace) {
         return Hook.hook(origin, replace);
     }
@@ -40,7 +39,7 @@ public class HookManager implements IhookManager {
             Method ori = receiver.getClass().getDeclaredMethod(origin, params);
             Method rep = receiver.getClass().getDeclaredMethod(replace, params);
             Log.i(TAG, "origin:"+origin+" replace:"+replace);
-            return Hook.hook(ori, rep);
+            return hookMethod(ori, rep);
         }
         catch (Exception e) {
             Log.i(TAG, "E:"+e);
@@ -52,5 +51,10 @@ public class HookManager implements IhookManager {
     @Override
     public Object callOriginMethod(Object receiver, String methodName, Object... params) {
         return Hook.callOrigin(receiver, methodName, params);
+    }
+
+    @Override
+    public Method recoveryMethod(String origin) {
+        return Hook.recovery(origin);
     }
 }

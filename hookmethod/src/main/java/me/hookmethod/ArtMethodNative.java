@@ -50,9 +50,19 @@ public class ArtMethodNative {
      *
      * @param ori 即将被hook的方法
      * @param stub "桩" 方法
+     * @return origin 的 access_flag.
+     */
+    public static native int backupMethod(Method stub, Method ori);
+
+    /**
+     * 恢复hook函数,从桩上恢复,包括访问权限等.
+     *
+     * @param ori 即将被hook的方法
+     * @param stub "桩" 方法
+     * @param access_flag 访问权限.
      * @return 是否成功
      */
-    public static native boolean backupMethod(Method stub, Method ori);
+    public static native boolean recoveryMethod(Method ori, Method stub, int access_flag);
 
     /**
      * hook的主方法，此方法只完成native层method结构数据结构替换
