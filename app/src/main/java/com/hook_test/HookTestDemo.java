@@ -33,20 +33,16 @@ public class HookTestDemo {
             }
 
             // public
-            mIhookManager.hookMethod(Class.forName("com.hook_test.HookTestDemo"),
-                    "test_public", "public_hook", String.class);
+            mIhookManager.hookMethod(Class.forName("com.hook_test.HookTestDemo"), "test_public", "public_hook", String.class);
 
             // protect
-            mIhookManager.hookMethod(Class.forName("com.hook_test.HookTestDemo"),
-                    "test_protect", "protect_hook", String.class);
+            mIhookManager.hookMethod(Class.forName("com.hook_test.HookTestDemo"), "test_protect", "protect_hook", String.class);
 
             // private
-            mIhookManager.hookMethod(Class.forName("com.hook_test.HookTestDemo"),
-                    "test_private", "private_hook", String.class);
+            mIhookManager.hookMethod(Class.forName("com.hook_test.HookTestDemo"), "test_private", "private_hook", String.class);
 
             // static
-            mIhookManager.hookMethod(Class.forName("com.hook_test.HookTestDemo"),
-                    "test_static", "static_hook", String.class);
+            mIhookManager.hookMethod(Class.forName("com.hook_test.HookTestDemo"), "test_static", "static_hook", String.class);
 
             setText("hook 完成");
         }
@@ -58,11 +54,12 @@ public class HookTestDemo {
 
     public void recovery() {
         try {
-            String origin = "test_public";
-            mIhookManager.recoveryMethod(origin);
-            Method method = this.getClass().getDeclaredMethod(origin, String.class);
-            method.invoke(this, "RECOVERYED!");
-            setText("恢复:"+origin+" success!");
+            mIhookManager.recoveryMethod("test_public");
+            mIhookManager.recoveryMethod("test_protect");
+            mIhookManager.recoveryMethod("test_private");
+            mIhookManager.recoveryMethod("test_static");
+            Method method = this.getClass().getDeclaredMethod("test_public", String.class);
+            setText("恢复:success!");
         }
         catch (Exception e) {
             Log.i(TAG, "-e:"+e);
@@ -107,6 +104,9 @@ public class HookTestDemo {
             Toast.makeText(mContext, "test_protect hook success", Toast.LENGTH_SHORT).show();
             setText("test_protect hook 执行 success");
         }
+        else {
+            setText("test_protect:"+tag);
+        }
     }
     protected void protect_hook(String tag) {
         Log.i(TAG, "-protect_hook:"+tag);
@@ -123,6 +123,9 @@ public class HookTestDemo {
             Toast.makeText(mContext, "test_private hook success", Toast.LENGTH_SHORT).show();
             setText("test_private hook 执行 success");
         }
+        else {
+            setText("test_private:"+tag);
+        }
     }
     private void private_hook(String tag) {
         Log.i(TAG, "-private_hook:"+tag);
@@ -134,6 +137,9 @@ public class HookTestDemo {
         if (ret == 1) {
             Toast.makeText(mContext, "test_static hook success", Toast.LENGTH_SHORT).show();
             setText("test_static hook 执行 success");
+        }
+        else {
+            setText("test_static:"+tag);
         }
     }
 

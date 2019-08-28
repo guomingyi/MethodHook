@@ -4,11 +4,30 @@ import android.content.Context;
 import android.util.Log;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Hook {
     private static final String TAG = "Hook_";
     private static HashMap<String, BackUpObj> sBackupMap = new HashMap<String, BackUpObj>();
+    private static ArrayList<Method> stubMethodList = new ArrayList<Method>();
+
+    private static ArrayList<Method> getBakStubMethod() {
+        final ArrayList<Method> s = stubMethodList;
+        if (s.size() == 0) {
+            try {
+                Method[] methods = BackUpStub.class.getDeclaredMethods();
+                for (int i = 0; i < methods.length; i++) {
+                    s.add(methods[i]);
+                }
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+                Log.i(TAG, "E:"+e);
+            }
+        }
+        return s;
+    }
 
     /** Hook方法入口,原方法保存在sBackupMap中 */
     public static boolean hook(Method origin, Method replace) {
@@ -18,13 +37,14 @@ public class Hook {
 
         try {
             /** index 用于拿到桩方法索引 */
-            int index = sBackupMap.size();
-            Method backUp = BackUpStub.class.getDeclaredMethod("bak_"+index);
+            Method backUp = getBakStubMethod().get(0);
             int access_flags = ArtMethodNative.backupMethod(backUp, origin);
             if (access_flags > 0) {
                 backUp.setAccessible(true);
                 /** 哈希表保存 */
                 sBackupMap.put(origin.getName(), new BackUpObj(access_flags, backUp, origin));
+                getBakStubMethod().remove(backUp);
+                Log.i(TAG, "stubList:"+getBakStubMethod().size());
                 return ArtMethodNative.hookMethod(origin, replace);
             }
         }
@@ -56,7 +76,9 @@ public class Hook {
             Method recovery = sBackupMap.get(origin).getRecovery();
             int access = sBackupMap.get(origin).getAccess_flags();
             ArtMethodNative.recoveryMethod(recovery, backup, access);
-            sBackupMap.get(origin).setUsed(0); // 标记为已经不再使用.
+            getBakStubMethod().add(backup);
+            sBackupMap.remove(origin);
+            Log.i(TAG, "stubList:"+getBakStubMethod().size());
             return recovery;
         }
         catch (Exception e) {
