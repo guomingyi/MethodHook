@@ -27,10 +27,7 @@ public class HookTestDemo {
         mContext = context;
 
         try {
-           // mIhookManager = RefsManager.instance(context);
-            if (mIhookManager == null) {
-                mIhookManager = new me.hookmethod.HookManager(context);
-            }
+            mIhookManager = RefsManager.instance(context);
 
             // public
             mIhookManager.hookMethod(Class.forName("com.hook_test.HookTestDemo"), "test_public", "public_hook", String.class);
